@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f2f3ea">
+  <title>ComicCraft | Comic studio</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='/app.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="ComicCraft home">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <span>ComicCraft</span>
+    </a>
+    <div class="topbar-meta">
+      <span class="edition">STORY STUDIO <span>01</span></span>
+      <span class="connection"><i></i>{% if hf_enabled %}Image model ready{% else %}Local art ready{% endif %}</span>
+    </div>
+  </header>
+
+  <main class="studio-shell">
+    <section class="controls-column" aria-labelledby="page-title">
+      <div class="eyebrow"><span class="eyebrow-line"></span> YOUR NEXT LITTLE UNIVERSE</div>
+      <h1 id="page-title">Make a comic<br>worth keeping<span class="heading-period">.</span></h1>
+      <p class="intro-copy">A premise, a hero, six panels. Start anywhere.</p>
+
+      {% if error %}<p class="alert" role="alert">{{ error }}</p>{% endif %}
+
+      <form action="/generate" method="post" class="creator-form" id="comic-form">
+        <label class="field field-wide" for="story-prompt">
+          <span class="field-label">The spark <span>01</span></span>
+          <textarea id="story-prompt" name="story_prompt" rows="3" minlength="8" maxlength="1000" required placeholder="A lighthouse keeper discovers the stars are going out…">{{ values.story_prompt }}</textarea>
+        </label>
+
+        <div class="field-row">
+          <label class="field" for="character-name">
+            <span class="field-label">Lead character <span>02</span></span>
+            <input id="character-name" name="character_name" maxlength="60" required placeholder="Mira" value="{{ values.character_name }}">
+          </label>
+          <label class="field" for="setting">
+            <span class="field-label">Where it happens <span>03</span></span>
+            <input id="setting" name="setting" maxlength="100" required placeholder="A floating harbor" value="{{ values.setting }}">
+          </label>
+        </div>
+
+        <div class="field-row">
+          <label class="field" for="tone">
+            <span class="field-label">Mood <span>04</span></span>
+            <select id="tone" name="tone">
+              {% for option in ["adventure", "funny", "mysterious", "heartfelt", "sci-fi", "fantasy"] %}
+                <option value="{{ option }}" {% if values.tone == option %}selected{% endif %}>{{ option|title }}</option>
+              {% endfor %}
+            </select>
+          </label>
+          <label class="field" for="art-style">
+            <span class="field-label">Ink & color <span>05</span></span>
+            <select id="art-style" name="art_style">
+              {% for option in ["graphic novel", "manga", "watercolor", "retro", "storybook"] %}
+                <option value="{{ option }}" {% if values.art_style == option %}selected{% endif %}>{{ option|title }}</option>
+              {% endfor %}
+            </select>
+          </label>
+        </div>
+
+        <label class="art-toggle {% if not hf_enabled %}art-toggle-disabled{% endif %}">
+          <input type="checkbox" name="use_ai_art" value="true" {% if not hf_enabled %}disabled{% endif %}>
+          <span class="toggle-box" aria-hidden="true"></span>
+          <span class="toggle-copy"><strong>Generate AI artwork</strong><small>{% if hf_enabled %}Uses your Hugging Face image model{% else %}Add HF_API_KEY to enable{% endif %}</small></span>
+          <span class="toggle-tag">OPTIONAL</span>
+        </label>
+
+        <button class="primary-button" type="submit">
+          <span>Create my comic</span><span class="button-arrow" aria-hidden="true">&#8594;</span>
+        </button>
+        <p class="form-footnote">Six panels <span></span> PDF included</p>
+      </form>
+    </section>
+
+    <section class="preview-column" aria-label="Comic preview">
+      <div class="preview-heading">
+        <div><span class="eyebrow">THE PAGE</span><h2>Room for a story.</h2></div>
+        <span class="panel-count">06 <b>/</b> 06</span>
+      </div>
+      <div class="empty-comic" aria-hidden="true">
+        <div class="empty-panel panel-sun"><span>01</span><i></i><b></b></div>
+        <div class="empty-panel panel-water"><span>02</span><i></i><b></b></div>
+        <div class="empty-panel panel-coral"><span>03</span><i></i><b></b></div>
+        <div class="empty-panel panel-night"><span>04</span><i></i><b></b></div>
+        <div class="empty-panel panel-green"><span>05</span><i></i><b></b></div>
+        <div class="empty-panel panel-sky"><span>06</span><i></i><b></b></div>
+      </div>
+      <div class="preview-caption"><span class="caption-mark">CC</span><p>Every great panel starts with<br><em>one good what-if.</em></p><span class="caption-star">&#10022;</span></div>
+      <div class="preview-baseline"><span>COMICCRAFT STUDIO</span><span>IDEA NO. 001</span></div>
+    </section>
+  </main>
+  <script>
+    document.getElementById("comic-form").addEventListener("submit", function () {
+      const button = this.querySelector("button[type=submit]");
+      button.disabled = true;
+      button.querySelector("span:first-child").textContent = "Building your panels…";
+    });
+  </script>
+</body>
+</html>
